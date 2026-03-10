@@ -1,8 +1,5 @@
 package before.middle_man;
 
-/**
- * Supporting class: Order
- */
 public class Order {
     private Long id;
     private String name;

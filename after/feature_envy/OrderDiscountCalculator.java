@@ -1,4 +1,4 @@
-package before.feature_envy;
+package after.feature_envy;
 
 public class OrderDiscountCalculator {
 

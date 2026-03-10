@@ -1,8 +1,5 @@
 package after.message_chains;
 
-/**
- * Supporting class: Address
- */
 public class Address {
     private String city;
     private String shippingZone;
