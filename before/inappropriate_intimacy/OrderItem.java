@@ -1,8 +1,5 @@
 package before.inappropriate_intimacy;
 
-/**
- * Supporting class: OrderItem
- */
 public class OrderItem {
     private String name;
     private double price;

@@ -1,10 +1,5 @@
 package before.message_chains;
 
-/**
- * Supporting class: Order
- *
- * CODE SMELL: This class enables message chains by exposing nested objects.
- */
 public class Order {
     private Customer customer;
     private String orderNumber;

@@ -1,8 +1,5 @@
 package before.message_chains;
 
-/**
- * Supporting class: Customer
- */
 public class Customer {
     private Address address;
     private String name;

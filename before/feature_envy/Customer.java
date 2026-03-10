@@ -3,9 +3,6 @@ package before.feature_envy;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Supporting class: Customer
- */
 public class Customer {
     private String name;
     private MembershipLevel membershipLevel;
