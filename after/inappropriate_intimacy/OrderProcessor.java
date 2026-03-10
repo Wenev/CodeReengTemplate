@@ -12,40 +12,28 @@ public class OrderProcessor {
      *
      * No more:
      * - order.status (direct field access)
-     * - order.orderItems (internal collection access)
-     * - order.paymentGateway.accountBalance (nested object access)
+     * - order.amount (direct field access)
+     * - order.paymentInfo (nested object access)
      */
     public void processOrder(Order order) {
         if (order.getStatus().equals("PENDING")) {
-            // Use behavior-exposing methods instead of direct access
-            if (!order.hasItems()) {
-                throw new IllegalStateException("Cannot process empty order");
-            }
-
-            // Use delegate method instead of order.paymentGateway.getAccountBalance()
-            if (!order.hasSufficientFunds()) {
+            // Use delegate method instead of order.paymentInfo.isAccountValid()
+            if (order.hasValidPayment()) {
+                order.approve();
+            } else {
                 order.markPaymentFailed();
-                return;
             }
 
-            order.markAsProcessing();
-
-            // Use behavior method instead of iterating internal list
-            if (!order.allItemsAvailable()) {
-                order.markOutOfStock();
-                return;
-            }
-
-            order.approve();
+            // Use public method instead of accessing amount directly
+            order.applyBulkDiscount(10);
         }
     }
 
     /**
-     * REFACTORED: Apply discount using Order's public API
+     * REFACTORED: Use public API method
      */
-    public void applyDiscount(Order order, double discountPercent) {
-        // Use public method instead of accessing orderItems directly
-        double discountedTotal = order.calculateDiscountedTotal(discountPercent);
-        System.out.println("Applied discount. New total: " + discountedTotal);
+    public String getCustomerStatus(Order order) {
+        // Use public method instead of accessing internal fields
+        return order.getFormattedStatus();
     }
 }

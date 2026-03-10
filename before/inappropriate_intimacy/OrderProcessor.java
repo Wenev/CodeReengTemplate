@@ -4,9 +4,9 @@ package before.inappropriate_intimacy;
  * CODE SMELL: Inappropriate Intimacy
  *
  * This class:
- * 1. Accesses Order's internal fields directly (order.status, order.orderItems)
+ * 1. Accesses Order's internal fields directly (order.status, order.amount)
  * 2. Modifies Order's internal state without proper encapsulation
- * 3. Accesses nested objects' internals (order.paymentGateway.accountBalance)
+ * 3. Accesses nested objects' internals (order.paymentInfo.accountNumber)
  * 4. Knows too much about Order's implementation details
  */
 public class OrderProcessor {
@@ -17,44 +17,26 @@ public class OrderProcessor {
     public void processOrder(Order order) {
         // Inappropriate Intimacy: Direct field access
         if (order.status.equals("PENDING")) {
-            // Inappropriate Intimacy: Accessing internal list
-            if (order.orderItems.isEmpty()) {
-                throw new IllegalStateException("Cannot process empty order");
-            }
-
             // Inappropriate Intimacy: Accessing nested object internals
-            if (order.paymentGateway.getAccountBalance() < 0) {
+            if (order.getPaymentInfo().isAccountValid()) {
+                // Inappropriate Intimacy: Direct field manipulation
+                order.status = "APPROVED";
+            } else {
                 order.status = "PAYMENT_FAILED";
-                return;
             }
 
-            // Inappropriate Intimacy: Direct field manipulation
-            order.status = "PROCESSING";
-
-            // Inappropriate Intimacy: Iterating over internal collection
-            for (OrderItem item : order.orderItems) {
-                if (!item.isAvailable()) {
-                    order.status = "OUT_OF_STOCK";
-                    return;
-                }
+            // Inappropriate Intimacy: Applying discount by accessing amount directly
+            if (order.amount > 1000) {
+                order.amount = order.amount * 0.9; // 10% discount
             }
-
-            order.status = "APPROVED";
         }
     }
 
     /**
-     * Another example of inappropriate intimacy - applying discount
+     * Another example of inappropriate intimacy
      */
-    public void applyDiscount(Order order, double discountPercent) {
-        // Inappropriate Intimacy: Accessing internal list to calculate total
-        double total = 0;
-        for (OrderItem item : order.orderItems) {
-            total += item.getPrice();
-        }
-
-        // Inappropriate Intimacy: Direct field access
-        double discountedTotal = total * (1 - discountPercent / 100);
-        System.out.println("Applied discount. New total: " + discountedTotal);
+    public String getCustomerStatus(Order order) {
+        // Inappropriate Intimacy: Accessing internal fields
+        return order.customerName + " - Order: $" + order.amount + " - " + order.status;
     }
 }

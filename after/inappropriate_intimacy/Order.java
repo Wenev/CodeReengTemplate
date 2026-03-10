@@ -1,8 +1,5 @@
 package after.inappropriate_intimacy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * REFACTORED: Inappropriate Intimacy - Fixed with Encapsulation
  *
@@ -16,46 +13,23 @@ import java.util.List;
 public class Order {
     // Private fields - proper encapsulation
     private String status;
-    private final List<OrderItem> orderItems;
-    private final PaymentGateway paymentGateway;
+    private double amount;
+    private String customerName;
+    private final PaymentInfo paymentInfo;
 
-    public Order() {
+    public Order(String customerName, double amount) {
+        this.customerName = customerName;
+        this.amount = amount;
         this.status = "PENDING";
-        this.orderItems = new ArrayList<>();
-        this.paymentGateway = new PaymentGateway();
+        this.paymentInfo = new PaymentInfo();
     }
 
     /**
      * REFACTORED: Expose behavior, not data
      */
-    public void addItem(OrderItem item) {
-        orderItems.add(item);
-    }
-
-    public boolean hasItems() {
-        return !orderItems.isEmpty();
-    }
-
-    public boolean allItemsAvailable() {
-        return orderItems.stream().allMatch(OrderItem::isAvailable);
-    }
-
-    public double getTotal() {
-        return orderItems.stream().mapToDouble(OrderItem::getPrice).sum();
-    }
-
-    /**
-     * REFACTORED: State changes through validated methods
-     */
     public void approve() {
-        if (status.equals("PENDING") && hasItems() && allItemsAvailable()) {
+        if (status.equals("PENDING") && paymentInfo.isAccountValid()) {
             status = "APPROVED";
-        }
-    }
-
-    public void markAsProcessing() {
-        if (status.equals("PENDING")) {
-            status = "PROCESSING";
         }
     }
 
@@ -63,25 +37,38 @@ public class Order {
         status = "PAYMENT_FAILED";
     }
 
-    public void markOutOfStock() {
-        status = "OUT_OF_STOCK";
-    }
-
     public String getStatus() {
         return status;
     }
 
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
     /**
-     * REFACTORED: Delegate method for payment check
+     * REFACTORED: Delegate method for payment validation
      */
-    public boolean hasSufficientFunds() {
-        return paymentGateway.getAccountBalance() >= 0;
+    public boolean hasValidPayment() {
+        return paymentInfo.isAccountValid();
     }
 
     /**
      * REFACTORED: Apply discount through Order's API
      */
-    public double calculateDiscountedTotal(double discountPercent) {
-        return getTotal() * (1 - discountPercent / 100);
+    public void applyBulkDiscount(double percent) {
+        if (amount > 1000) {
+            amount = amount * (1 - percent / 100);
+        }
+    }
+
+    /**
+     * REFACTORED: Get formatted status through Order's API
+     */
+    public String getFormattedStatus() {
+        return customerName + " - Order: $" + amount + " - " + status;
     }
 }

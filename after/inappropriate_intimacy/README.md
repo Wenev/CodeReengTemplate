@@ -7,9 +7,8 @@ Classes now respect each other's boundaries through proper encapsulation.
 ## Changes Made
 
 1. **All fields are private** - No direct access from outside
-2. **Behavior-exposing methods** - `hasItems()`, `allItemsAvailable()`, etc.
-3. **State change methods** - `approve()`, `markAsProcessing()`, etc.
-4. **Delegate methods** - `hasSufficientFunds()`, `calculateDiscountedTotal()`
+2. **Behavior-exposing methods** - `approve()`, `hasValidPayment()`, etc.
+3. **State change methods** - `markPaymentFailed()`, `applyBulkDiscount()`
 
 ## Before vs After
 
@@ -17,10 +16,12 @@ Classes now respect each other's boundaries through proper encapsulation.
 ```java
 public void processOrder(Order order) {
     if (order.status.equals("PENDING")) {
-        if (order.orderItems.isEmpty()) { ... }
-        if (order.paymentGateway.getAccountBalance() < 0) { ... }
-        order.status = "PROCESSING";
-        for (OrderItem item : order.orderItems) { ... }
+        if (order.getPaymentInfo().isAccountValid()) {
+            order.status = "APPROVED";
+        }
+        if (order.amount > 1000) {
+            order.amount = order.amount * 0.9;
+        }
     }
 }
 ```
@@ -29,10 +30,10 @@ public void processOrder(Order order) {
 ```java
 public void processOrder(Order order) {
     if (order.getStatus().equals("PENDING")) {
-        if (!order.hasItems()) { ... }
-        if (!order.hasSufficientFunds()) { ... }
-        order.markAsProcessing();
-        if (!order.allItemsAvailable()) { ... }
+        if (order.hasValidPayment()) {
+            order.approve();
+        }
+        order.applyBulkDiscount(10);
     }
 }
 ```
