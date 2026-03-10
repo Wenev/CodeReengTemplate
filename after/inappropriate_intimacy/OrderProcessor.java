@@ -1,51 +1,37 @@
 package after.inappropriate_intimacy;
 
-/**
- * REFACTORED: OrderProcessor now uses proper encapsulation
- *
- * Instead of accessing internal fields, it uses the public API.
- */
 public class OrderProcessor {
-
-    /**
-     * REFACTORED: Uses Order's public API, not internal fields
-     *
-     * No more:
-     * - order.status (direct field access)
-     * - order.orderItems (internal collection access)
-     * - order.paymentGateway.accountBalance (nested object access)
-     */
     public void processOrder(Order order) {
-        if (order.getStatus().equals("PENDING")) {
-            // Use behavior-exposing methods instead of direct access
-            if (!order.hasItems()) {
+        if (order.status.equals("PENDING")) {
+            if (order.orderItems.isEmpty()) {
                 throw new IllegalStateException("Cannot process empty order");
             }
 
-            // Use delegate method instead of order.paymentGateway.getAccountBalance()
-            if (!order.hasSufficientFunds()) {
-                order.markPaymentFailed();
+            if (order.paymentGateway.getAccountBalance() < 0) {
+                order.status = "PAYMENT_FAILED";
                 return;
             }
 
-            order.markAsProcessing();
+            order.status = "PROCESSING";
 
-            // Use behavior method instead of iterating internal list
-            if (!order.allItemsAvailable()) {
-                order.markOutOfStock();
-                return;
+            for (OrderItem item : order.orderItems) {
+                if (!item.isAvailable()) {
+                    order.status = "OUT_OF_STOCK";
+                    return;
+                }
             }
 
-            order.approve();
+            order.status = "APPROVED";
         }
     }
 
-    /**
-     * REFACTORED: Apply discount using Order's public API
-     */
     public void applyDiscount(Order order, double discountPercent) {
-        // Use public method instead of accessing orderItems directly
-        double discountedTotal = order.calculateDiscountedTotal(discountPercent);
+        double total = 0;
+        for (OrderItem item : order.orderItems) {
+            total += item.getPrice();
+        }
+
+        double discountedTotal = total * (1 - discountPercent / 100);
         System.out.println("Applied discount. New total: " + discountedTotal);
     }
 }

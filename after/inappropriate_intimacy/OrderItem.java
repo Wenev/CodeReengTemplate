@@ -1,12 +1,9 @@
 package after.inappropriate_intimacy;
 
-/**
- * Supporting class: OrderItem
- */
 public class OrderItem {
-    private final String name;
-    private final double price;
-    private final boolean available;
+    private String name;
+    private double price;
+    private boolean available;
 
     public OrderItem(String name, double price, boolean available) {
         this.name = name;
