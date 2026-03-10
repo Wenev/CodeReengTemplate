@@ -10,6 +10,7 @@ public class OrderProcessor {
                 order.status = "PAYMENT_FAILED";
             }
 
+            //buik-discount
             if (order.amount > 1000) {
                 order.amount = order.amount * 0.9;
             }
